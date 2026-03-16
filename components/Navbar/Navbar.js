@@ -1,24 +1,27 @@
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { useState } from "react";
 import { motion } from "framer-motion";
 
 const links = [
-  { href: "#home", label: "Home" },
-  { href: "#research", label: "Research" },
-  { href: "#gallery", label: "Gallery" },
-  { href: "#team", label: "Team" },
-  { href: "#contact", label: "Contact" },
+  { href: "/", label: "Home" },
+  { href: "/research", label: "Research" },
+  { href: "/gallery", label: "Gallery" },
+  { href: "/team", label: "Team" },
+  { href: "/contact", label: "Contact" },
 ];
 
-export default function Navbar({ seasonTheme }) {
+export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <header className="fixed top-0 z-50 w-full">
-      <nav className="mx-auto mt-4 w-[min(94%,76rem)] rounded-2xl border border-white/10 bg-[#081C15]/72 px-4 py-3 backdrop-blur-md md:px-6">
+      <nav className="mx-auto mt-4 w-[min(94%,76rem)] rounded-2xl border border-white/10 bg-[#081C15]/84 px-4 py-3 backdrop-blur-md md:px-6">
         <div className="flex items-center justify-between">
-          <a href="#home" className="text-sm font-semibold uppercase tracking-[0.18em] text-[#E4F4EA]">
+          <Link href="/" className="text-sm font-semibold uppercase tracking-[0.18em] text-[#E4F4EA]">
             Forest Research Lab
-          </a>
+          </Link>
 
           <button
             type="button"
@@ -30,20 +33,15 @@ export default function Navbar({ seasonTheme }) {
 
           <div className="hidden items-center gap-6 md:flex">
             {links.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
-                className="text-sm text-[#C5E8D4] transition-colors"
-                style={{ "--hover": seasonTheme.accent }}
-                onMouseEnter={(event) => {
-                  event.currentTarget.style.color = seasonTheme.accent;
-                }}
-                onMouseLeave={(event) => {
-                  event.currentTarget.style.color = "#C5E8D4";
-                }}
+                className={`text-sm transition-colors hover:text-[#60d3a1] ${
+                  router.pathname === link.href ? "text-[#60d3a1]" : "text-[#C5E8D4]"
+                }`}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -55,14 +53,16 @@ export default function Navbar({ seasonTheme }) {
             className="mt-3 flex flex-col gap-2 rounded-xl border border-white/10 bg-[#0C241A]/80 p-3 md:hidden"
           >
             {links.map((link) => (
-              <a
+              <Link
                 key={link.href}
                 href={link.href}
-                className="rounded-lg px-2 py-2 text-sm text-[#CFEADA]"
+                className={`rounded-lg px-2 py-2 text-sm ${
+                  router.pathname === link.href ? "text-[#60d3a1]" : "text-[#CFEADA]"
+                }`}
                 onClick={() => setOpen(false)}
               >
                 {link.label}
-              </a>
+              </Link>
             ))}
           </motion.div>
         ) : null}

@@ -1,136 +1,82 @@
-import dynamic from "next/dynamic";
-import { motion } from "framer-motion";
+import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import heroImage1 from "../../images/1.jpeg";
+import heroImage3 from "../../images/3.jpeg";
+import heroImage8 from "../../images/8.jpeg";
+import heroImage5 from "../../images/5.jpeg";
 
-const ForestScene = dynamic(() => import("../ForestScene/ForestScene"), {
-  ssr: false,
-});
+const heroImages = [heroImage1, heroImage3, heroImage8, heroImage5];
+const IMAGE_ROTATION_MS = 3000;
+const IMAGE_CROSSFADE_DURATION = 2.5;
 
-const seasons = ["summer", "winter", "monsoon"];
-
-function HeroFallback({ seasonTheme }) {
-  return (
-    <div className="absolute inset-0 overflow-hidden" style={{ backgroundColor: seasonTheme.background }}>
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(circle at 22% 15%, rgba(149,213,178,0.24), transparent 55%), radial-gradient(circle at 80% 28%, rgba(45,106,79,0.42), transparent 60%)",
-        }}
-      />
-      <motion.div
-        className="absolute -left-16 top-1/4 h-72 w-72 rounded-full blur-3xl"
-        style={{ backgroundColor: `${seasonTheme.accent}2e` }}
-        animate={{ x: [0, 26, 0], y: [0, 16, 0] }}
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="absolute -right-20 bottom-8 h-80 w-80 rounded-full blur-3xl"
-        style={{ backgroundColor: `${seasonTheme.secondary}6b` }}
-        animate={{ x: [0, -24, 0], y: [0, -18, 0] }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-      />
-    </div>
-  );
-}
-
-export default function Hero({ season, seasonTheme, onSeasonChange }) {
-  const [show3D, setShow3D] = useState(false);
+export default function Hero() {
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia("(max-width: 900px)");
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const timer = setInterval(() => {
+      setActiveImageIndex((prev) => (prev + 1) % heroImages.length);
+    }, IMAGE_ROTATION_MS);
 
-    const updatePreference = () => {
-      const lowPowerDevice = (navigator.hardwareConcurrency || 8) <= 4;
-      setShow3D(!mediaQuery.matches && !reducedMotion.matches && !lowPowerDevice);
-    };
-
-    updatePreference();
-    mediaQuery.addEventListener("change", updatePreference);
-    reducedMotion.addEventListener("change", updatePreference);
-
-    return () => {
-      mediaQuery.removeEventListener("change", updatePreference);
-      reducedMotion.removeEventListener("change", updatePreference);
-    };
+    return () => clearInterval(timer);
   }, []);
 
   return (
     <section id="home" className="relative min-h-screen w-full overflow-hidden">
       <div className="absolute inset-0">
-        {show3D ? <ForestScene season={season} seasonTheme={seasonTheme} /> : <HeroFallback seasonTheme={seasonTheme} />}
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#081C15]/42 to-[#081C15]" />
+        <AnimatePresence mode="sync">
+          <motion.div
+            key={heroImages[activeImageIndex].src}
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat will-change-transform"
+            style={{ backgroundImage: `url('${heroImages[activeImageIndex].src}'), url('/placeholders/gallery.svg')` }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: IMAGE_CROSSFADE_DURATION, ease: "easeInOut" }}
+          />
+        </AnimatePresence>
+        <div className="absolute inset-0 bg-gradient-to-b from-[#04110c]/25 via-[#081C15]/50 to-[#081C15]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,211,166,0.22),transparent_56%)]" />
       </div>
 
       <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl items-center justify-center px-6 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.95, ease: "easeOut" }}
+          transition={{ duration: 1.4, delay: 0.9, ease: "easeOut" }}
           className="max-w-3xl"
         >
-          <span
-            className="inline-flex rounded-full border px-4 py-1 text-xs uppercase tracking-[0.22em]"
-            style={{
-              borderColor: `${seasonTheme.accent}7d`,
-              color: seasonTheme.accent,
-              backgroundColor: `${seasonTheme.accent}14`,
-            }}
-          >
-            Seasonal Theme: {season.charAt(0).toUpperCase() + season.slice(1)}
+          <span className="inline-flex rounded-full border border-[#60d3a18a] bg-[#60d3a11a] px-4 py-1 text-xs uppercase tracking-[0.25em] text-[#7CE0B5]">
+            Tropical Forest Systems Lab
           </span>
 
-          <div className="mt-5 flex flex-wrap items-center justify-center gap-2">
-            {seasons.map((seasonName) => {
-              const active = season === seasonName;
-              return (
-                <button
-                  key={seasonName}
-                  type="button"
-                  onClick={() => onSeasonChange?.(seasonName)}
-                  className="rounded-full border px-4 py-2 text-xs uppercase tracking-[0.16em] transition duration-200"
-                  style={{
-                    borderColor: active ? seasonTheme.accent : `${seasonTheme.accent}78`,
-                    backgroundColor: active ? `${seasonTheme.accent}30` : "transparent",
-                    color: active ? "#EAF8EF" : "#C9EEDB",
-                  }}
-                >
-                  {seasonName}
-                </button>
-              );
-            })}
-          </div>
-
-          <h1 className="mt-6 text-balance text-4xl font-semibold tracking-tight text-[#EAF8EF] md:text-6xl">
-            Forest Ecology & Biodiversity Research
+          <h1 className="mt-6 text-balance text-5xl font-semibold leading-[0.95] tracking-tight text-[#F2FBF7] md:text-8xl">
+            Forest Ecology &{" "}
+            <span className="text-[#63D3A6]">
+              Biodiversity
+            </span>{" "}
+            Research Lab
           </h1>
-          <p className="mt-6 text-pretty text-base leading-relaxed text-[#C9EEDB] md:text-xl">
-            Exploring ecosystems, understanding biodiversity, and protecting tropical forests.
+          <p className="mt-6 text-pretty text-base leading-relaxed text-[#D7F3E5] md:text-xl">
+            Exploring ecosystems, understanding biodiversity, and supporting conservation decisions
+            through high-impact tropical forest science.
           </p>
 
           <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <motion.a
+            <motion.div
               whileHover={{ y: -3, scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              href="#research"
-              className="rounded-full border px-7 py-3 text-sm font-medium text-[#E8F8EE] backdrop-blur transition duration-300"
-              style={{
-                borderColor: seasonTheme.accent,
-                backgroundColor: `${seasonTheme.accent}1f`,
-              }}
+              className="rounded-full border border-[#63D3A6] bg-[#63D3A630] px-7 py-3 text-sm font-medium text-[#E8F8EE] backdrop-blur transition duration-300"
             >
-              Explore Research
-            </motion.a>
-            <motion.a
+              <Link href="/research">Explore Research</Link>
+            </motion.div>
+            <motion.div
               whileHover={{ y: -3, scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              href="#team"
-              className="rounded-full border px-7 py-3 text-sm font-medium text-[#E8F8EE] transition duration-300 hover:text-white"
-              style={{ borderColor: `${seasonTheme.accent}8c` }}
+              className="rounded-full border border-[#63D3A68c] px-7 py-3 text-sm font-medium text-[#E8F8EE] transition duration-300 hover:text-white"
             >
-              Meet the Team
-            </motion.a>
+              <Link href="/gallery">View Gallery</Link>
+            </motion.div>
           </div>
         </motion.div>
       </div>
