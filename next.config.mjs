@@ -8,6 +8,10 @@ const localTailwindcss = path.join(localNodeModules, "tailwindcss");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: "export",
+  basePath: "/forest2",
+  assetPrefix: "/forest2/",
+  images: { unoptimized: true },
   // Keep Next.js rooted to this project folder.
   outputFileTracingRoot: __dirname,
   turbopack: {
