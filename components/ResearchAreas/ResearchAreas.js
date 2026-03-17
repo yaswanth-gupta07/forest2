@@ -1,12 +1,13 @@
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 import image1 from "../../images/1.jpeg";
 import image3 from "../../images/3.jpeg";
 import image5 from "../../images/5.jpeg";
 import image8 from "../../images/8.jpeg";
 
-const researchTopics = [
+const hardcodedTopics = [
   {
     title: "Invasion Ecology",
     description: "Mapping spread dynamics of invasive species across sensitive forest corridors.",
@@ -34,22 +35,70 @@ const researchTopics = [
   },
 ];
 
-function ImageWithFallback({ src, alt }) {
+function ImageWithFallback({ src, alt, isExternal }) {
   const [currentSrc, setCurrentSrc] = useState(src);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => { setCurrentSrc(src); setFailed(false); }, [src]);
+
+  if (isExternal && !failed) {
+    return (
+      <img
+        src={currentSrc}
+        alt={alt}
+        className="absolute inset-0 w-full h-full object-cover transition duration-700 group-hover:scale-110"
+        onError={() => { setFailed(true); setCurrentSrc("/placeholders/research.svg"); }}
+      />
+    );
+  }
 
   return (
     <Image
-      src={currentSrc}
+      src={failed ? "/placeholders/research.svg" : currentSrc}
       alt={alt}
       fill
       className="object-cover transition duration-700 group-hover:scale-110"
-      onError={() => setCurrentSrc("/placeholders/gallery.svg")}
+      onError={() => { setFailed(true); setCurrentSrc("/placeholders/research.svg"); }}
     />
   );
 }
 
 export default function ResearchAreas() {
   const [selectedTopic, setSelectedTopic] = useState(null);
+  const [dbTopics, setDbTopics] = useState([]);
+
+  useEffect(() => {
+    fetchFromSupabase();
+
+    const channel = supabase
+      .channel("research-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "research" }, () => {
+        fetchFromSupabase();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  async function fetchFromSupabase() {
+    try {
+      const { data } = await supabase
+        .from("research")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (data) setDbTopics(data);
+    } catch {}
+  }
+
+  const researchTopics = [
+    ...hardcodedTopics,
+    ...dbTopics.map((item) => ({
+      title: item.title,
+      description: item.description,
+      image: item.image_url || "/placeholders/research.svg",
+      isExternal: !!item.image_url,
+    })),
+  ];
 
   return (
     <section className="mx-auto max-w-6xl px-6 pt-12 pb-24 md:pt-16 md:pb-32">
@@ -80,7 +129,7 @@ export default function ResearchAreas() {
             onClick={() => setSelectedTopic(topic)}
           >
             <div className="relative aspect-[16/9] overflow-hidden">
-              <ImageWithFallback src={topic.image} alt={`${topic.title} visual`} />
+              <ImageWithFallback src={topic.image} alt={`${topic.title} visual`} isExternal={topic.isExternal} />
               <div className="absolute inset-0 bg-gradient-to-t from-[#07170f]/70 via-transparent to-transparent" />
             </div>
             <div className="p-5">
@@ -108,7 +157,7 @@ export default function ResearchAreas() {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="relative aspect-[16/9] overflow-hidden">
-                <ImageWithFallback src={selectedTopic.image} alt={selectedTopic.title} />
+                <ImageWithFallback src={selectedTopic.image} alt={selectedTopic.title} isExternal={selectedTopic.isExternal} />
               </div>
               <div className="p-6">
                 <h3 className="text-2xl font-semibold text-[#EBF8F0]">{selectedTopic.title}</h3>

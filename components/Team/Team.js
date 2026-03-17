@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 import sreenathPhoto from "../../images/team/sreenath.png";
 import sharanaPhoto from "../../images/team/Sharana.jpg";
 import albertPhoto from "../../images/team/Albert.jpg";
@@ -121,23 +122,73 @@ const members = [
   },
 ];
 
-function ProfileImageWithFallback({ src, alt, className }) {
+function ProfileImageWithFallback({ src, alt, className, isExternal }) {
   const [currentSrc, setCurrentSrc] = useState(src);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => { setCurrentSrc(src); setFailed(false); }, [src]);
+
+  if (isExternal && !failed) {
+    return (
+      <img
+        src={currentSrc}
+        alt={alt}
+        className={`absolute inset-0 w-full h-full ${className || ""}`}
+        onError={() => { setFailed(true); setCurrentSrc("/placeholders/profile.svg"); }}
+      />
+    );
+  }
 
   return (
     <Image
-      src={currentSrc}
+      src={failed ? "/placeholders/profile.svg" : currentSrc}
       alt={alt}
       fill
       className={className}
-      onError={() => setCurrentSrc("/placeholders/profile.svg")}
+      onError={() => { setFailed(true); setCurrentSrc("/placeholders/profile.svg"); }}
     />
   );
 }
 
 export default function Team() {
   const [expanded, setExpanded] = useState(null);
+  const [dbMembers, setDbMembers] = useState([]);
   const [head, ...teamMembers] = members;
+
+  useEffect(() => {
+    fetchFromSupabase();
+
+    const channel = supabase
+      .channel("team-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "team" }, () => {
+        fetchFromSupabase();
+      })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
+  async function fetchFromSupabase() {
+    try {
+      const { data } = await supabase
+        .from("team")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (data) setDbMembers(data);
+    } catch {}
+  }
+
+  const allTeamMembers = [
+    ...teamMembers,
+    ...dbMembers.map((m) => ({
+      name: m.name,
+      role: m.role,
+      tagline: m.description || "",
+      photo: m.image_url || "/placeholders/profile.svg",
+      bio: m.description ? [m.description] : [],
+      isExternal: !!m.image_url,
+    })),
+  ];
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-24 md:py-32">
@@ -179,7 +230,7 @@ export default function Team() {
       </motion.article>
 
       <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {teamMembers.map((member, index) => (
+        {allTeamMembers.map((member, index) => (
           <motion.article
             key={member.name}
             initial={{ opacity: 0, y: 25 }}
@@ -190,7 +241,7 @@ export default function Team() {
             className="rounded-2xl border border-white/10 bg-[#123325]/42 p-5 shadow-[0_16px_44px_rgba(0,0,0,0.28)]"
           >
             <div className="relative mb-4 aspect-square w-full overflow-hidden rounded-xl border border-white/15">
-              <ProfileImageWithFallback src={member.photo} alt={`${member.name} profile`} className="object-cover" />
+              <ProfileImageWithFallback src={member.photo} alt={`${member.name} profile`} className="object-cover" isExternal={member.isExternal} />
             </div>
             <h3 className="text-lg font-semibold text-[#ECF9F1]">{member.name}</h3>
             <p className="mt-1 text-sm text-[#8CE0BD]">{member.role}</p>
