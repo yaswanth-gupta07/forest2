@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 const links = [
   { href: "/", label: "Home" },
@@ -16,16 +16,15 @@ export default function Navbar() {
   const router = useRouter();
 
   return (
-    <header className="fixed top-0 z-50 w-full">
-      <nav className="mx-auto mt-4 w-[min(94%,76rem)] rounded-2xl border border-white/10 bg-[#081C15]/84 px-4 py-3 backdrop-blur-md md:px-6">
-        <div className="flex items-center justify-between">
-          <Link href="/" className="text-sm font-semibold uppercase tracking-[0.18em] text-[#E4F4EA]">
-            Forest Research Lab
-          </Link>
-
+    <header className="fixed top-0 left-0 right-0 z-50 w-full max-w-[100vw] min-w-0 flex items-center justify-between gap-3 px-4 md:px-6 pt-4">
+      <Link href="/" className="min-w-0 flex-shrink font-black text-xl uppercase tracking-[0.08em] text-[#F2FBF7] hover:text-[#60d3a1] transition-colors md:text-4xl" style={{ fontFamily: "'Bebas Neue', sans-serif" }}>
+        Forest Ecology <span className="text-[#63D3A6]">Lab</span>
+      </Link>
+      <nav className="flex-shrink-0 rounded-2xl bg-[#0d2818] px-3 py-2 md:rounded-3xl md:px-5 md:py-3">
+        <div className="flex items-center gap-4">
           <button
             type="button"
-            className="inline-flex rounded-lg border border-white/15 px-3 py-1 text-xs text-[#D1ECDC] md:hidden"
+            className="inline-flex rounded-lg border border-white/15 px-3 py-1.5 text-xs text-[#D1ECDC] md:hidden"
             onClick={() => setOpen((prev) => !prev)}
           >
             Menu
@@ -45,28 +44,48 @@ export default function Navbar() {
             ))}
           </div>
         </div>
-
-        {open ? (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mt-3 flex flex-col gap-2 rounded-xl border border-white/10 bg-[#0C241A]/80 p-3 md:hidden"
-          >
-            {links.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`rounded-lg px-2 py-2 text-sm ${
-                  router.pathname === link.href ? "text-[#60d3a1]" : "text-[#CFEADA]"
-                }`}
-                onClick={() => setOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </motion.div>
-        ) : null}
       </nav>
+
+      {/* Mobile menu - dimmed backdrop + compact nav dropdown */}
+      <AnimatePresence>
+        {open ? (
+          <>
+            <motion.button
+              key="backdrop"
+              type="button"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[55] bg-black/40 md:hidden"
+              onClick={() => setOpen(false)}
+              aria-label="Close menu"
+            />
+            <motion.div
+              key="mobile-menu"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.2 }}
+              className="fixed right-4 top-20 z-[60] w-[calc(100%-2rem)] max-w-xs rounded-2xl border border-white/10 bg-[#0d2818]/95 p-3 shadow-xl backdrop-blur-md md:hidden"
+            >
+              <div className="flex flex-col gap-0.5">
+                {links.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`rounded-lg px-4 py-2.5 text-sm ${
+                      router.pathname === link.href ? "bg-[#63D3A6]/25 text-[#60d3a1]" : "text-[#CFEADA] hover:bg-white/5"
+                    }`}
+                    onClick={() => setOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+          </>
+        ) : null}
+      </AnimatePresence>
     </header>
   );
 }

@@ -53,9 +53,7 @@ export default function Gallery() {
         viewport={{ once: true, amount: 0.25 }}
         transition={{ duration: 0.7 }}
       >
-        <p className="text-sm uppercase tracking-[0.2em] text-[#63D3A6]">
-          Visual Archive
-        </p>
+       
         <h2 className="mt-3 text-4xl font-semibold text-[#E8F8EE] md:text-6xl">Forest Gallery</h2>
         <p className="mt-5 max-w-2xl text-[#C5E8D6]">
           Landscapes, field operations, and biodiversity moments captured across seasonal campaigns.

@@ -9,11 +9,30 @@ import swedhaPhoto from "../../images/team/Swedha.jpg";
 import vyshakhPhoto from "../../images/team/Vyshakh.png";
 import vijayalakshmiPhoto from "../../images/team/Vijayalakshmi.jpg";
 import premPhoto from "../../images/team/prem.jpg";
+import colImg1 from "../../images/1.jpeg";
+import colImg2 from "../../images/2.jpeg";
+import colImg3 from "../../images/3.jpeg";
+import colImg4 from "../../images/4.jpeg";
+import colImg5 from "../../images/5.jpeg";
+import colImg6 from "../../images/6.jpeg";
+import colImg7 from "../../images/7.jpeg";
+import colImg8 from "../../images/8.jpeg";
+
+const collaborators = [
+  { name: "Collaborator One", affiliation: "University / Institution", photo: colImg1 },
+  { name: "Collaborator Two", affiliation: "University / Institution", photo: colImg2 },
+  { name: "Collaborator Three", affiliation: "University / Institution", photo: colImg3 },
+  { name: "Collaborator Four", affiliation: "University / Institution", photo: colImg4 },
+  { name: "Collaborator Five", affiliation: "University / Institution", photo: colImg5 },
+  { name: "Collaborator Six", affiliation: "University / Institution", photo: colImg6 },
+  { name: "Collaborator Seven", affiliation: "University / Institution", photo: colImg7 },
+  { name: "Collaborator Eight", affiliation: "University / Institution", photo: colImg8 },
+];
 
 const members = [
   {
     name: "Sreenath Subrahmanyam",
-    role: "Head of Lab | Principal Investigator",
+    role: "Principal Investigator",
     tagline: "From rainforest trails to climate science - protecting forests and understanding biodiversity.",
     photo: sreenathPhoto,
     bio: [
@@ -128,10 +147,8 @@ export default function Team() {
         viewport={{ once: true, amount: 0.25 }}
         transition={{ duration: 0.7 }}
       >
-        <p className="text-sm uppercase tracking-[0.2em] text-[#63D3A6]">
-          Leadership & Team
-        </p>
-        <h2 className="mt-3 text-4xl font-semibold text-[#E8F8EE] md:text-6xl">Meet Our Research Team</h2>
+       
+        <h2 className="mt-3 text-4xl font-semibold text-[#E8F8EE] md:text-6xl">Research Team</h2>
       </motion.div>
 
       <motion.article
@@ -201,6 +218,38 @@ export default function Team() {
                 {expanded === member.name ? "Show Less" : "Read Full Profile"}
               </button>
             ) : null}
+          </motion.article>
+        ))}
+      </div>
+
+      <motion.div
+        initial={{ opacity: 0, y: 22 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.25 }}
+        transition={{ duration: 0.7 }}
+        className="mt-20"
+      >
+        <h2 className="text-4xl font-semibold text-[#E8F8EE] md:text-6xl">Collaborators</h2>
+      </motion.div>
+
+      <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {collaborators.map((person, index) => (
+          <motion.article
+            key={person.name}
+            initial={{ opacity: 0, y: 25 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.2 }}
+            transition={{ duration: 0.65, delay: index * 0.05 }}
+            whileHover={{ y: -4 }}
+            className="rounded-2xl border border-white/10 bg-[#123325]/42 overflow-hidden shadow-[0_16px_44px_rgba(0,0,0,0.28)]"
+          >
+            <div className="relative aspect-square w-full overflow-hidden">
+              <ProfileImageWithFallback src={person.photo} alt={person.name} className="object-cover" />
+            </div>
+            <div className="p-4">
+              <h3 className="text-base font-semibold text-[#ECF9F1]">{person.name}</h3>
+              <p className="mt-1 text-sm text-[#8CE0BD]">{person.affiliation}</p>
+            </div>
           </motion.article>
         ))}
       </div>

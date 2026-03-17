@@ -6,7 +6,7 @@ export default function ResearchPage() {
   return (
     <div className="min-h-screen bg-[#081C15] text-[#E8F8EE]">
       <Navbar />
-      <main className="pt-24">
+      <main className="pt-10">
         <ResearchAreas />
       </main>
       <Footer />

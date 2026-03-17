@@ -6,11 +6,13 @@ const __dirname = path.dirname(__filename);
 const localNodeModules = path.join(__dirname, "node_modules");
 const localTailwindcss = path.join(localNodeModules, "tailwindcss");
 
+const isProd = process.env.NODE_ENV === "production";
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
-  basePath: "/forest2",
-  assetPrefix: "/forest2/",
+  basePath: isProd ? "/forest2" : "",
+  assetPrefix: isProd ? "/forest2/" : "",
   images: { unoptimized: true },
   // Keep Next.js rooted to this project folder.
   outputFileTracingRoot: __dirname,

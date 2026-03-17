@@ -1,14 +1,24 @@
-import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import heroImage1 from "../../images/1.jpeg";
-import heroImage3 from "../../images/3.jpeg";
-import heroImage8 from "../../images/8.jpeg";
-import heroImage5 from "../../images/5.jpeg";
+import image1 from "../../images/1.jpeg";
+import image2 from "../../images/2.jpeg";
+import image3 from "../../images/3.jpeg";
+import image4 from "../../images/4.jpeg";
+import image5 from "../../images/5.jpeg";
+import image6 from "../../images/6.jpeg";
+import image7 from "../../images/7.jpeg";
+import image8 from "../../images/8.jpeg";
+import image9 from "../../images/9.jpeg";
+import image10 from "../../images/10.jpeg";
+import image11 from "../../images/11.jpeg";
+import image12 from "../../images/12.jpeg";
+import image13 from "../../images/13.jpeg";
+import image14 from "../../images/14.jpeg";
+import image15 from "../../images/15.jpeg";
 
-const heroImages = [heroImage1, heroImage3, heroImage8, heroImage5];
-const IMAGE_ROTATION_MS = 3000;
-const IMAGE_CROSSFADE_DURATION = 2.5;
+const heroImages = [image1, image2, image3, image4, image5, image6, image7, image8, image9, image10, image11, image12, image13, image14, image15];
+const IMAGE_ROTATION_MS = 6000;
+const IMAGE_CROSSFADE_DURATION = 1.5;
 
 export default function Hero() {
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -20,6 +30,13 @@ export default function Hero() {
 
     return () => clearInterval(timer);
   }, []);
+
+  const goTo = (index) => {
+    setActiveImageIndex(((index % heroImages.length) + heroImages.length) % heroImages.length);
+  };
+
+  const goPrev = () => goTo(activeImageIndex - 1);
+  const goNext = () => goTo(activeImageIndex + 1);
 
   return (
     <section id="home" className="relative min-h-screen w-full overflow-hidden">
@@ -35,50 +52,46 @@ export default function Hero() {
             transition={{ duration: IMAGE_CROSSFADE_DURATION, ease: "easeInOut" }}
           />
         </AnimatePresence>
-        <div className="absolute inset-0 bg-gradient-to-b from-[#04110c]/25 via-[#081C15]/50 to-[#081C15]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(99,211,166,0.22),transparent_56%)]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#081C15]/40" />
       </div>
 
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-6xl items-center justify-center px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.4, delay: 0.9, ease: "easeOut" }}
-          className="max-w-3xl"
-        >
-          <span className="inline-flex rounded-full border border-[#60d3a18a] bg-[#60d3a11a] px-4 py-1 text-xs uppercase tracking-[0.25em] text-[#7CE0B5]">
-            Tropical Forest Systems Lab
-          </span>
+      {/* Left arrow - goes to previous (left) */}
+      <button
+        type="button"
+        onClick={goPrev}
+        className="absolute left-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/40 p-3 text-white backdrop-blur-sm transition-colors hover:bg-black/60"
+        aria-label="Previous image"
+      >
+        <svg className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+        </svg>
+      </button>
 
-          <h1 className="mt-6 text-balance text-5xl font-semibold leading-[0.95] tracking-tight text-[#F2FBF7] md:text-8xl">
-            Forest Ecology &{" "}
-            <span className="text-[#63D3A6]">
-              Biodiversity
-            </span>{" "}
-            Research Lab
-          </h1>
-          <p className="mt-6 text-pretty text-base leading-relaxed text-[#D7F3E5] md:text-xl">
-            Exploring ecosystems, understanding biodiversity, and supporting conservation decisions
-            through high-impact tropical forest science.
-          </p>
+      {/* Right arrow - goes to next (right) */}
+      <button
+        type="button"
+        onClick={goNext}
+        className="absolute right-4 top-1/2 z-20 -translate-y-1/2 rounded-full bg-black/40 p-3 text-white backdrop-blur-sm transition-colors hover:bg-black/60"
+        aria-label="Next image"
+      >
+        <svg className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth={2.5} viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </button>
 
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <motion.div
-              whileHover={{ y: -3, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="rounded-full border border-[#63D3A6] bg-[#63D3A630] px-7 py-3 text-sm font-medium text-[#E8F8EE] backdrop-blur transition duration-300"
-            >
-              <Link href="/research">Explore Research</Link>
-            </motion.div>
-            <motion.div
-              whileHover={{ y: -3, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="rounded-full border border-[#63D3A68c] px-7 py-3 text-sm font-medium text-[#E8F8EE] transition duration-300 hover:text-white"
-            >
-              <Link href="/gallery">View Gallery</Link>
-            </motion.div>
-          </div>
-        </motion.div>
+      {/* Line-style progress indicator - uniform segments, short on mobile */}
+      <div className="absolute bottom-8 left-1/2 z-20 flex -translate-x-1/2 items-center gap-1 md:gap-2">
+        {heroImages.map((_, i) => (
+          <button
+            key={i}
+            type="button"
+            onClick={() => goTo(i)}
+            className={`h-1.5 w-2 flex-none rounded-sm transition-colors md:h-1.5 md:min-w-[20px] md:max-w-[32px] md:flex-1 ${
+              i === activeImageIndex ? "bg-[#63D3A6]" : "bg-white/80"
+            }`}
+            aria-label={`Go to image ${i + 1} of ${heroImages.length}`}
+          />
+        ))}
       </div>
     </section>
   );
