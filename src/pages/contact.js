@@ -32,12 +32,8 @@ export default function ContactPage() {
           transition={{ duration: 0.6 }}
           className="rounded-3xl border border-white/10 bg-[#123326]/40 p-8 shadow-[0_22px_50px_rgba(0,0,0,0.25)] md:p-12"
         >
-          <p className="text-sm uppercase tracking-[0.2em] text-[#63D3A6]">Contact</p>
-          <h1 className="mt-3 text-4xl font-semibold md:text-6xl">Get in touch with the lab</h1>
-          <p className="mt-5 max-w-2xl text-[#C4E7D4]">
-            Reach out for research collaborations, student opportunities, or biodiversity monitoring
-            partnerships. Send your details to the lab head.
-          </p>
+          <h1 className="mt-3 text-4xl font-semibold md:text-6xl">Get in touch </h1>
+          
 
           <div className="mt-10 grid gap-4 md:grid-cols-2">
             <div className="rounded-2xl border border-white/10 bg-[#0E281D]/70 p-5">
